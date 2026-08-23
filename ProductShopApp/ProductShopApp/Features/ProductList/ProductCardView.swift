@@ -31,7 +31,14 @@ struct ProductCardView: View {
                     
                         .font(.inter(.semiBold, size: 13))
                     Spacer()
-                    BadgeView(title: "+", horizontalPadding: 9, height: 30, cornerRadius: 10, weight: .inter(.medium, size: 19), background: .badge, foreground: .white)
+                    
+                    Button {
+                        print(" add ")
+                    } label: {
+                        BadgeView(title: "+", horizontalPadding: 9, height: 30, cornerRadius: 10, weight: .inter(.medium, size: 19), background: .badge, foreground: .white)
+                    }
+
+                    
                 }
                 
             }

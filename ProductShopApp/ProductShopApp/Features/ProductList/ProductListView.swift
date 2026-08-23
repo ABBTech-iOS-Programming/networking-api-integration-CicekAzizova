@@ -91,8 +91,6 @@ struct ProductListView: View {
                                
                             }
                         }
-                        
-                        
                     }
                     
                     .padding(.horizontal, 24)
@@ -101,7 +99,7 @@ struct ProductListView: View {
             
             .navigationDestination(for: Product.self) { product in
                             if let index = viewModel.products.firstIndex(where: { $0.id == product.id }) {
-                                ProductDetailsView(product: $viewModel.products[index])
+                                ProductDetailsView(viewModel: viewModel, product: $viewModel.products[index])
                             }
                         }
         }

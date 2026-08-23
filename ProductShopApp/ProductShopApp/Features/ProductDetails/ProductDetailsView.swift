@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct ProductDetailsView: View {
+    
+    @Bindable var viewModel: ProductViewModel
 
     @Binding var product: Product
     
@@ -30,6 +32,29 @@ struct ProductDetailsView: View {
         }
     }
     
+    @State var quantity: Int = 1
+    
+    
+    
+     var totalPrice: Double {
+         product.price * Double(quantity)
+    }
+    
+    var price: some View {
+        VStack(alignment: .leading) {
+            Text("Price")
+                .font(.inter(.regular, size: 11))
+                .foregroundStyle(.tabBar)
+                
+                
+            
+            Text(totalPrice, format: .currency(code: "USD").presentation(.narrow))
+                .foregroundStyle(.badge)
+                .font(.inter(.bold, size: 24))
+                
+        }
+    }
+    
     var stockBadgeView: some View {
         Text("In Stock: \(product.stock)")
             .lineLimit(1)
@@ -43,6 +68,8 @@ struct ProductDetailsView: View {
     
    
     var body: some View {
+        
+        
         
         ScrollView{
             VStack(alignment: .leading) {
@@ -94,34 +121,22 @@ struct ProductDetailsView: View {
                     .padding(.top, 8)
                     .padding(.leading, 6)
                 
-                HStack(spacing: 19) {
-                    Button {
-                        
-                    } label: {
-                        BadgeView(title: "-", horizontalPadding: 16, height: 42, cornerRadius: 12, weight: .inter(.medium, size: 20), background: .quantityButton, foreground: .black)
-                    }
-                    
-                    Text("1")
-                    
-                    Button {
-                        
-                    } label: {
-                        BadgeView(title: "+", horizontalPadding: 14, height: 42, cornerRadius: 12, weight: .inter(.medium, size: 20), background: .quantityButton, foreground: .black)
-                    }
-                    
-                }
+                QuantityView(product: product, quantity: $quantity)
                 .padding(.bottom,25)
-                HStack {
-                    VStack(alignment: .leading) {
-                        Text("Price")
-                            .font(.inter(.regular, size: 11))
-                            .foregroundStyle(.tabBar)
-                            .padding(.bottom,6)
-                        
-                        Text(product.price, format: .currency(code: "USD").presentation(.narrow))
-                    }
-                    Spacer()
-                    BadgeView(title: "Add to Cart", horizontalPadding: 69, height: 58, cornerRadius: 18, weight: .inter(.semiBold, size: 15), background: .badge, foreground: .white)
+                
+                    price
+                 
+            }
+            .overlay(alignment: .bottomTrailing) {
+                Button {
+                    print(" add to card")
+                } label: {
+                    Text("Add to Cart")
+                        .foregroundStyle(.white)
+                        .font(.inter(.semiBold, size: 15))
+                        .frame(width: 212,height: 58)
+                        .background(.badge)
+                        .clipShape(RoundedRectangle(cornerRadius: 18))
                 }
             }
             .padding(.horizontal,24)
@@ -133,6 +148,7 @@ struct ProductDetailsView: View {
                    
                     Button {
                         product.isFavorite.toggle()
+                        viewModel.saveFavorite()
                     } label: {
                         Image(systemName: product.isFavorite ? "heart.fill" : "heart")
                             .foregroundStyle(product.isFavorite ? .red : .primary)
@@ -149,6 +165,6 @@ struct ProductDetailsView: View {
 #Preview {
     @Previewable @State var product = Product.sample
     NavigationStack {
-        ProductDetailsView(product: $product)
+        ProductDetailsView(viewModel: ProductViewModel(), product: $product)
     }
 }

@@ -11,6 +11,16 @@ import SwiftUI
 final class ProductViewModel {
     var products: [Product] = []
     
+    var isFavorite: Bool = false
+    
+    let defaults = UserDefaults.standard
+    
+    private enum Key {
+        static let isFavorite = "isFavorite"
+    }
+    
+    
+    
     private let urlString: String = "https://dummyjson.com/products?limit=194"
     
     func fetchProduct() async {
@@ -45,5 +55,13 @@ final class ProductViewModel {
             print("Decode error: \(error)")
 
         }
+    }
+    
+    func saveFavorite() {
+        defaults.set(isFavorite, forKey: Key.isFavorite)
+        }
+    
+    func loadFavorite() {
+       isFavorite =  defaults.bool(forKey: Key.isFavorite)
     }
 }
