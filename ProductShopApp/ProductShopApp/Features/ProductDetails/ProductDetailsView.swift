@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import SDWebImageSwiftUI
 
 struct ProductDetailsView: View {
     
@@ -13,31 +14,42 @@ struct ProductDetailsView: View {
 
     @Binding var product: Product
     
+    @State var currentImage: Int = 0
+    
     var image: some View {
         VStack {
-            AsyncImage(url: URL(string: product.thumbnail)){ image in
-                image
-                    .resizable()
-                    .scaledToFill()
-                
-            }placeholder: {
-                ProgressView()
+            TabView(selection: $currentImage) {
+                ForEach(product.images.indices,id: \.self) {index in
+                    WebImage(url: URL(string: product.images[index])){ image in
+                        image
+                            .resizable()
+                            .scaledToFill()
+                        
+                    }placeholder: {
+                        ProgressView()
+                    }
+                }
             }
-            .frame(width: 342,height: 258)
-            .clipShape(RoundedRectangle(cornerRadius: 24))
-            .clipped()
+            .tabViewStyle(.page(indexDisplayMode: .never))
+                .frame(width: 342,height: 258)
+                .clipShape(RoundedRectangle(cornerRadius: 24))
+                .clipped()
+                
+            PageIndicatorView(totalImage: product.images.count, currentImage: currentImage)
+                
             
-            Circle()
-                .frame(width: 5,height: 5)
         }
     }
     
     @State var quantity: Int = 1
     
+    var discount: Double {
+        (100 - product.discountPercentage) / 100
+    }
     
     
      var totalPrice: Double {
-         product.price * Double(quantity)
+         product.price * Double(quantity) * discount
     }
     
     var price: some View {
@@ -125,6 +137,7 @@ struct ProductDetailsView: View {
                 .padding(.bottom,25)
                 
                     price
+                
                  
             }
             .overlay(alignment: .bottomTrailing) {
@@ -142,7 +155,6 @@ struct ProductDetailsView: View {
             .padding(.horizontal,24)
             .navigationTitle("Product Details")
             .navigationBarTitleDisplayMode(.inline)
-            
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                    
