@@ -11,7 +11,7 @@ import SDWebImageSwiftUI
 
 struct FavoriteCardView: View {
     
-    let viewModel: ProductViewModel
+    @Bindable var viewModel: ProductViewModel
     
     let product: Product
     
@@ -29,18 +29,8 @@ struct FavoriteCardView: View {
                     .font(.inter(.regular, size: 10))
                     .foregroundStyle(.secondary)
                 HStack {
-                    
                     Text("★")
                     Text(String(format: "%.1f", product.rating))
-                        .padding(.trailing, 150)
-                    if viewModel.isFavorite {
-                        Image(systemName: "heart.fill")
-                            .resizable()
-                            .frame(width: 20, height: 20)
-                            .foregroundStyle(.red)
-                            .padding(.horizontal, 24)
-                    }
-                    
                 }
                 .foregroundStyle(.rating)
                 .font(.inter(.semiBold, size: 10))
@@ -53,12 +43,23 @@ struct FavoriteCardView: View {
                 }
                 
             }
+            .overlay(alignment: .trailing) {
+                
+                Button {
+                    viewModel.toggleFavorite(for: product.id)
+                } label: {
+                    Image(systemName:  "heart.fill" )
+                    .foregroundStyle(.red)
+                }
+                .buttonStyle(.plain)
+                
+            }
         }
-       
-        .frame(height: 212)
+
         .background(.white)
         .clipShape(RoundedRectangle(cornerRadius: 18))
         .clipped()
+       
         
     }
     

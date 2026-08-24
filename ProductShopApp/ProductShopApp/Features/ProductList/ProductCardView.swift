@@ -31,16 +31,16 @@ struct ProductCardView: View {
                     
                         .font(.inter(.semiBold, size: 13))
                     Spacer()
-                    
-                    Button {
-                        print(" add ")
-                    } label: {
-                        BadgeView(title: "+", horizontalPadding: 9, height: 30, cornerRadius: 10, weight: .inter(.medium, size: 19), background: .badge, foreground: .white)
-                    }
-
-                    
+   
                 }
                 
+            }
+            .overlay(alignment: .bottomTrailing) {
+                Button {
+                    print(" add ")
+                } label: {
+                    BadgeView(title: "+", horizontalPadding: 9, height: 30, cornerRadius: 10, weight: .inter(.medium, size: 19), background: .badge, foreground: .white)
+                }
             }
             .padding(.top,12)
             .padding(.horizontal,12)

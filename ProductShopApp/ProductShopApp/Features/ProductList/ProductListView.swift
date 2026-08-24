@@ -11,21 +11,17 @@ struct ProductListView: View {
     
     @Bindable var viewModel: ProductViewModel
     
-    @State  var selectedCategory: CategoryFilter = .all
+    @State  var selectedCategory: String? = nil
     
     @State var searchText: String = ""
     
     var filteredProducts: [Product] {
-    let categoryFiltered = selectedCategory == .all
-        ? viewModel.products
-        : viewModel.products.filter { selectedCategory.matchingAPICategories.contains($0.category) }
-    
-    if searchText.isEmpty {
-        return categoryFiltered
+        if searchText.isEmpty {
+            return viewModel.products
             } else {
-        return categoryFiltered.filter {
-            $0.title.contains(searchText) ||
-            ($0.brand?.contains(searchText) ?? false)
+                return viewModel.products.filter {
+                    $0.title.localizedCaseInsensitiveContains(searchText) ||
+                    ($0.brand?.localizedCaseInsensitiveContains(searchText) ?? false)
             }
         }
     }
@@ -52,7 +48,7 @@ struct ProductListView: View {
                 }actions: {
                     Button("Try again") {
                         Task {
-                          await viewModel.fetchProduct()
+                            await viewModel.fetchProduct(for: selectedCategory)
                         }
                     }
                 }
@@ -81,11 +77,24 @@ struct ProductListView: View {
     
     var allCategory: some View {
         LazyHStack {
-            ForEach(CategoryFilter.allCases){ category in
-                BadgeView(title: category.rawValue, horizontalPadding: 22, height: 38, cornerRadius: 19, weight: .inter(.semiBold, size: 12), background: .badge, foreground: .white)
+            BadgeView(title: "All", horizontalPadding: 22, height: 38, cornerRadius: 19, weight: .inter(.semiBold, size: 12), background: .badge, foreground: .white)
+                .onTapGesture {
+                    selectedCategory = nil
+                    Task {
+                        await viewModel.fetchProduct(for: nil)
+                    }
+                }
+            
+            ForEach(viewModel.categories, id: \.self){ category in
+                BadgeView(title: category.capitalized, horizontalPadding: 22, height: 38, cornerRadius: 19, weight: .inter(.semiBold, size: 12), background: .badge, foreground: .white)
                     .onTapGesture {
                         selectedCategory = category
+                        Task {
+                            await viewModel.fetchProduct(for: selectedCategory)
+                        }
                     }
+                
+               
             }
         }
     }
@@ -135,10 +144,12 @@ struct ProductListView: View {
                         }
         }
         .task {
-            await viewModel.fetchProduct()
+            await viewModel.fetchCategories()
+            await viewModel.fetchProduct(for: selectedCategory)
+            
         }
         .refreshable {
-           await viewModel.fetchProduct()
+            await viewModel.fetchProduct(for: selectedCategory)
         }
     }
     
@@ -146,5 +157,5 @@ struct ProductListView: View {
 }
 
 #Preview {
-    ProductListView(viewModel: ProductViewModel(), selectedCategory: CategoryFilter.all)
+    ProductListView(viewModel: ProductViewModel())
 }

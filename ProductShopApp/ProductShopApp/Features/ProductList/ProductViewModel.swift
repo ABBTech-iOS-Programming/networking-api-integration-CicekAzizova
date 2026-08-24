@@ -11,22 +11,64 @@ import SwiftUI
 final class ProductViewModel {
     var products: [Product] = []
     
+    var categories: [String] = []
+    
     var state: ProductsViewState = .idle
     
-    var isFavorite: Bool = false
-    
-    let defaults = UserDefaults.standard
     
     private enum Key {
         static let isFavorite = "isFavorite"
     }
     
+    private var favoriteIds: [Int] {
+        get {
+            UserDefaults.standard.array(forKey: Key.isFavorite) as? [Int] ?? []
+        }
+        set {
+            UserDefaults.standard.set(newValue, forKey: Key.isFavorite)
+        }
+    }
+    
+    func loadItems() {
+        let savedSet = Set(favoriteIds)
+        
+        for i in products.indices {
+            if savedSet.contains(products[i].id){
+                products[i].isFavorite = true
+            }
+        }
+    }
+    
+    func toggleFavorite(for itemId: Int) {
+        guard let index = products.firstIndex(where: { $0.id == itemId }) else { return }
+        products[index].isFavorite.toggle()
+        
+        if products[index].isFavorite {
+            favoriteIds.insert(itemId, at: 0)
+        }else {
+            favoriteIds.removeAll { $0 == itemId }
+        }
+    }
+    
+    func fetchCategories() async {
+        let urlString = "https://dummyjson.com/products/category-list"
+        
+        guard let url = URL(string: urlString) else { return }
+        
+        do {
+            let (data, _) = try await URLSession.shared.data(from: url)
+            categories = try JSONDecoder().decode([String].self, from: data)
+        } catch  {
+            print("Category fetch error: \(error)")
+        }
+    }
     
     
-    private let urlString: String = "https://dummyjson.com/products?limit=194"
-    
-    func fetchProduct() async {
+    func fetchProduct(for category: String?) async {
         state = .loading
+        
+        let urlString = category.map({"https://dummyjson.com/products/category/\($0)"}) ?? "https://dummyjson.com/products?limit=194"
+        
         guard let url = URL(string: urlString) else {
             state = .error("Invalid Url")
             return
@@ -55,20 +97,17 @@ final class ProductViewModel {
             
             products = productResponse.products
             
+            loadItems()
+            
             state = productResponse.products.isEmpty ? .empty : .loaded
            
             
         }catch {
-            print("Decode error: \(error)")
+            state = .error("Decode error: \(error.localizedDescription)")
+           
 
         }
     }
     
-    func saveFavorite() {
-        defaults.set(isFavorite, forKey: Key.isFavorite)
-        }
     
-    func loadFavorite() {
-       isFavorite =  defaults.bool(forKey: Key.isFavorite)
-    }
 }

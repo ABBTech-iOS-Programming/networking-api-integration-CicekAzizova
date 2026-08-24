@@ -27,7 +27,9 @@ struct MainTabView: View {
             }
             
             Tab {
-                FavoriteView(viewModel: viewModel)
+                NavigationStack {
+                    FavoriteView(viewModel: viewModel)
+                }
             } label: {
                 Image(.heart)
                     
@@ -49,9 +51,7 @@ struct MainTabView: View {
 
         }
         .tint(.badge)
-        .refreshable {
-            await viewModel.fetchProduct()
-        }
+       
     }
 }
 

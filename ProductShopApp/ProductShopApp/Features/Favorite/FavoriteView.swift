@@ -11,21 +11,37 @@ struct FavoriteView: View {
     
     @Bindable var viewModel: ProductViewModel
     
-    private var hasFavorite: Bool {
-        viewModel.products.contains{ $0.isFavorite }
+    var favoriteProducts: [Product] {
+        viewModel.products.filter({ $0.isFavorite })
     }
     
-   
-    
-    
+    private var hasFavorite: Bool {
+        viewModel.products.contains { $0.isFavorite }
+    }
     var body: some View {
-        ScrollView {
-            ForEach(viewModel.products.filter({ $0.isFavorite })) {product  in
-                
-                FavoriteCardView(viewModel: viewModel, product: product)
-                
+        if hasFavorite {
+            List {
+                ForEach(favoriteProducts) {product  in
+                    
+                    NavigationLink(value: product) {
+                        FavoriteCardView(viewModel: viewModel, product: product)
+                    }
+                    .buttonStyle(.plain)
+                    
+                    .padding()
+                    
+                    
+                }
+            }
+            .navigationDestination(for: Product.self) { product in
+                if let index = viewModel.products.firstIndex(where: { $0.id == product.id }) {
+                    ProductDetailsView(viewModel: viewModel, product: $viewModel.products[index])
+                }
                 
             }
+        }
+        else {
+            ContentUnavailableView("No Favorites Yet", systemImage: "heart")
         }
     }
 }

@@ -67,17 +67,6 @@ struct ProductDetailsView: View {
         }
     }
     
-    var stockBadgeView: some View {
-        Text("In Stock: \(product.stock)")
-            .lineLimit(1)
-            .padding(.vertical, 7)
-            .padding(.horizontal, 16)
-            .background(.stockBadge)
-            
-            .clipShape(RoundedRectangle(cornerRadius: 24))
-            .clipped()
-    }
-    
    
     var body: some View {
         
@@ -159,8 +148,7 @@ struct ProductDetailsView: View {
                 ToolbarItem(placement: .topBarTrailing) {
                    
                     Button {
-                        product.isFavorite.toggle()
-                        viewModel.saveFavorite()
+                        viewModel.toggleFavorite(for: product.id)
                     } label: {
                         Image(systemName: product.isFavorite ? "heart.fill" : "heart")
                             .foregroundStyle(product.isFavorite ? .red : .primary)
@@ -168,6 +156,9 @@ struct ProductDetailsView: View {
                     }
                     
                 }
+            }
+            .onAppear{
+                viewModel.loadItems()
             }
         }
     }
