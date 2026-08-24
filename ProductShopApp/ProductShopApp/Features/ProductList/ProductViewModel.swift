@@ -11,6 +11,8 @@ import SwiftUI
 final class ProductViewModel {
     var products: [Product] = []
     
+    var state: ProductsViewState = .idle
+    
     var isFavorite: Bool = false
     
     let defaults = UserDefaults.standard
@@ -24,8 +26,9 @@ final class ProductViewModel {
     private let urlString: String = "https://dummyjson.com/products?limit=194"
     
     func fetchProduct() async {
+        state = .loading
         guard let url = URL(string: urlString) else {
-            print("Invalid Url")
+            state = .error("Invalid Url")
             return
         }
         
@@ -35,12 +38,14 @@ final class ProductViewModel {
             let (data, response) = try await URLSession.shared.data(for: requrest)
             
             guard let httpResponse = response as? HTTPURLResponse else {
-                print("Invalid response")
+                state = .error("Invalid response")
+               
                 return
             }
             
             guard (200...299).contains(httpResponse.statusCode) else {
-                print("Error \(httpResponse.statusCode)")
+                state = .error("Error \(httpResponse.statusCode)")
+              
                 return
             }
             
@@ -49,6 +54,8 @@ final class ProductViewModel {
            let productResponse = try decoder.decode(ProductsResponse.self, from: data)
             
             products = productResponse.products
+            
+            state = productResponse.products.isEmpty ? .empty : .loaded
            
             
         }catch {

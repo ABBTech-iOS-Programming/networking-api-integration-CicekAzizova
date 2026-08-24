@@ -8,22 +8,13 @@
 import SwiftUI
 
 struct WelcomeBannerCardView: View {
-    
-    let viewModel: ProductViewModel
-    
-    var discountText: String {
-        guard let discount = viewModel.products.first?.discountPercentage else {
-            return "0%"
-        }
-        return String(format: "%.0f%%", discount)
-    }
-    
+  
     var cardView: some View {
         VStack(alignment: .leading,spacing: 7){
             HStack {
                 greeting
                 Spacer()
-                BadgeView(title: discountText, horizontalPadding: 12, height: 28, cornerRadius: 14, weight: .inter(.semiBold, size: 12), background: .badge, foreground: .black)
+                BadgeView( title: "20% OFF", horizontalPadding: 12, height: 28, cornerRadius: 14, weight: .inter(.semiBold, size: 12), background: .badge, foreground: .black)
                     .padding(.trailing,20)
 
             }
@@ -63,5 +54,5 @@ struct WelcomeBannerCardView: View {
 }
 
 #Preview {
-    WelcomeBannerCardView(viewModel: ProductViewModel())
+    WelcomeBannerCardView()
 }

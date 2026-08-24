@@ -64,7 +64,7 @@ struct FavoriteCardView: View {
     
     var image: some View {
       
-            AsyncImage(url: URL(string: product.thumbnail)) { image in
+            WebImage(url: URL(string: product.thumbnail)) { image in
                 image
                     .resizable()
                     .scaledToFill()

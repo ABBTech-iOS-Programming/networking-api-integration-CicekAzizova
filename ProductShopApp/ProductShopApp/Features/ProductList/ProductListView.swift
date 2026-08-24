@@ -32,6 +32,32 @@ struct ProductListView: View {
   
     private let columns: [GridItem] = [GridItem(.flexible()),GridItem(.flexible())]
     
+    @ViewBuilder
+    var content: some View {
+        switch viewModel.state {
+        case .idle, .loading:
+            ProgressView("Loading...")
+        case .loaded:
+            productGrid
+        case .empty:
+            ContentUnavailableView(
+                "No post",
+                systemImage: "text.page",
+                description: Text("There are no posts to display")
+            )
+        case .error(let message):
+            ContentUnavailableView {
+                Label( " Something went wrong", systemImage: "exclamationmark.triangle") }description: {
+                    Text(message)
+                }actions: {
+                    Button("Try again") {
+                        Task {
+                          await viewModel.fetchProduct()
+                        }
+                    }
+                }
+        }
+    }
     
     var searchHolder: some View {
         ZStack(alignment: .topLeading) {
@@ -64,6 +90,18 @@ struct ProductListView: View {
         }
     }
     
+    var productGrid: some View {
+        LazyVGrid(columns: columns) {
+            ForEach(filteredProducts){ product in
+                NavigationLink(value: product) {
+                    ProductCardView(product: product)
+                }
+                .buttonStyle(.plain)
+               
+            }
+        }
+    }
+    
     var body: some View {
         NavigationStack {
             ZStack {
@@ -72,7 +110,7 @@ struct ProductListView: View {
                 
                 VStack {
                     ScrollView {
-                        WelcomeBannerCardView(viewModel: viewModel)
+                        WelcomeBannerCardView()
                             .padding(.bottom,14)
                         searchHolder
                         ScrollView(.horizontal) {
@@ -82,15 +120,8 @@ struct ProductListView: View {
                         }
                         .scrollIndicators(.hidden)
                         
-                        LazyVGrid(columns: columns) {
-                            ForEach(filteredProducts){ product in
-                                NavigationLink(value: product) {
-                                    ProductCardView(product: product)
-                                }
-                                .buttonStyle(.plain)
-                               
-                            }
-                        }
+                        productGrid
+                        
                     }
                     
                     .padding(.horizontal, 24)
@@ -105,6 +136,9 @@ struct ProductListView: View {
         }
         .task {
             await viewModel.fetchProduct()
+        }
+        .refreshable {
+           await viewModel.fetchProduct()
         }
     }
     

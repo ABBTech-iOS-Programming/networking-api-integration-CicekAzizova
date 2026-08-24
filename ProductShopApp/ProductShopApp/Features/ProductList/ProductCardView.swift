@@ -55,7 +55,7 @@ struct ProductCardView: View {
     
     var image: some View {
         ZStack(alignment: .topLeading) {
-            AsyncImage(url: URL(string: product.thumbnail)) { image in
+            WebImage(url: URL(string: product.thumbnail)) { image in
                 image
                     .resizable()
                     .scaledToFill()
