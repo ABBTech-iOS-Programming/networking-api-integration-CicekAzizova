@@ -68,7 +68,7 @@ final class ProductViewModel {
     func fetchProduct(for category: String?) async {
         state = .loading
         
-        let urlString = category.map({"https://dummyjson.com/products/category/\($0)"}) ?? "https://dummyjson.com/products?limit=194"
+        let urlString = category.map({"https://dummyjson.com/products/category/\($0)"}) ?? "https://dummyjson.com/products?limit=0"
         
         guard let url = URL(string: urlString) else {
             state = .error("Invalid Url")

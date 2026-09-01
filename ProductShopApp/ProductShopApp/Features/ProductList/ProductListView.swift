@@ -37,9 +37,9 @@ struct ProductListView: View {
             productGrid
         case .empty:
             ContentUnavailableView(
-                "No post",
+                "No product",
                 systemImage: "text.page",
-                description: Text("There are no posts to display")
+                description: Text("There are no products to display")
             )
         case .error(let message):
             ContentUnavailableView {
@@ -86,7 +86,8 @@ struct ProductListView: View {
                 }
             
             ForEach(viewModel.categories, id: \.self){ category in
-                BadgeView(title: category.capitalized, horizontalPadding: 22, height: 38, cornerRadius: 19, weight: .inter(.semiBold, size: 12), background: .badge, foreground: .white)
+                let isSelected = selectedCategory == category
+                BadgeView(title: category.capitalized, horizontalPadding: 22, height: 38, cornerRadius: 19, weight: .inter(.semiBold, size: 12), background: isSelected ? .badge : .white, foreground: isSelected ? .white : .black)
                     .onTapGesture {
                         selectedCategory = category
                         Task {
@@ -112,7 +113,6 @@ struct ProductListView: View {
     }
     
     var body: some View {
-        NavigationStack {
             ZStack {
                 Color(.homeBackground)
                     .ignoresSafeArea()
@@ -136,13 +136,12 @@ struct ProductListView: View {
                     .padding(.horizontal, 24)
                 }
             }
-            
             .navigationDestination(for: Product.self) { product in
                             if let index = viewModel.products.firstIndex(where: { $0.id == product.id }) {
                                 ProductDetailsView(viewModel: viewModel, product: $viewModel.products[index])
                             }
                         }
-        }
+        
         .task {
             await viewModel.fetchCategories()
             await viewModel.fetchProduct(for: selectedCategory)

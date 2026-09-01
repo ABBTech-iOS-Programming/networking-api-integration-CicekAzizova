@@ -125,11 +125,16 @@ struct ProductDetailsView: View {
                 QuantityView(product: product, quantity: $quantity)
                 .padding(.bottom,25)
                 
-                    price
+    
                 
                  
             }
-            .overlay(alignment: .bottomTrailing) {
+               
+            }
+        .safeAreaInset(edge: .bottom, content: {
+            HStack {
+                price
+                Spacer()
                 Button {
                     print(" add to card")
                 } label: {
@@ -140,7 +145,11 @@ struct ProductDetailsView: View {
                         .background(.badge)
                         .clipShape(RoundedRectangle(cornerRadius: 18))
                 }
+                .padding(.horizontal, 24)
+                .background(.white)
+                
             }
+        })
             .padding(.horizontal,24)
             .navigationTitle("Product Details")
             .navigationBarTitleDisplayMode(.inline)
@@ -163,7 +172,7 @@ struct ProductDetailsView: View {
         }
     }
         
-}
+
 
 #Preview {
     @Previewable @State var product = Product.sample

@@ -22,7 +22,6 @@ struct BadgeView: View {
             .lineLimit(1)
             .font(weight)
             .padding(.horizontal,horizontalPadding)
-            .foregroundStyle(.white)
             .frame(height: height)
             .background(background)
             .clipShape(RoundedRectangle(cornerRadius: cornerRadius))
